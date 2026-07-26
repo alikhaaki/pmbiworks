@@ -1,0 +1,4 @@
+venv/
+nohup.out
+*.pyc
+__pycache__/
