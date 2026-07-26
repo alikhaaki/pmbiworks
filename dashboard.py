@@ -21,6 +21,8 @@ PAGE_HTML = r"""
   * { box-sizing:border-box; margin:0; padding:0; }
   body { font-family: -apple-system, "Segoe UI", Arial, sans-serif; background:#f4f5f8; color:#1f2430; }
   .shell { display:flex; min-height:100vh; }
+
+  /* ---------- sidebar ---------- */
   .sidebar { width:230px; background:#12172b; color:#e3e6f0; padding:22px 18px; flex-shrink:0; }
   .brand { display:flex; align-items:center; gap:10px; margin-bottom:26px; }
   .brand .logo { width:38px; height:38px; border-radius:10px; background:#2a5bd7; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px; }
@@ -36,6 +38,8 @@ PAGE_HTML = r"""
   .profile .av { width:30px; height:30px; border-radius:50%; background:#2a5bd7; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; }
   .profile div div:first-child { font-size:12px; font-weight:600; }
   .profile div div:last-child { font-size:11px; color:#8a8f9c; }
+
+  /* ---------- main ---------- */
   .main { flex:1; padding:26px 30px; }
   .head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
   .head h1 { font-size:22px; }
@@ -43,6 +47,7 @@ PAGE_HTML = r"""
   .head-right { font-size:12px; color:#8a8f9c; display:flex; align-items:center; gap:14px; }
   .bell { position:relative; }
   .bell .dot { position:absolute; top:-4px; right:-4px; background:#e35d4f; color:#fff; font-size:9px; border-radius:50%; width:14px; height:14px; display:flex; align-items:center; justify-content:center; }
+
   .kpi-row { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:18px; }
   .kpi-card { background:#fff; border:1px solid #eceef2; border-radius:12px; padding:16px 16px 10px; }
   .kpi-top { display:flex; justify-content:space-between; align-items:flex-start; }
@@ -52,20 +57,24 @@ PAGE_HTML = r"""
   .kpi-delta { font-size:11px; color:#1c8a4b; margin-top:4px; }
   .kpi-vs { font-size:10px; color:#b3b7c2; }
   .spark { margin-top:8px; }
+
   .measure-row { display:flex; align-items:center; gap:10px; margin-bottom:18px; font-size:13px; }
   .measure-row .lbl { font-weight:600; margin-right:4px; }
   .pill { padding:6px 16px; border-radius:20px; border:1px solid #e1e3ea; color:#5b6070; font-size:12px; }
   .pill.active { background:#2a5bd7; color:#fff; border-color:#2a5bd7; }
+
   .row3 { display:grid; grid-template-columns:1.05fr 1.5fr 0.95fr; gap:16px; margin-bottom:18px; }
   .panel { background:#fff; border:1px solid #eceef2; border-radius:12px; padding:16px 18px; }
   .panel-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
   .panel-title { font-size:14px; font-weight:700; }
   .panel-sub { font-size:11px; color:#8a8f9c; margin-top:1px; }
   .chip { font-size:11px; color:#5b6070; border:1px solid #e1e3ea; border-radius:6px; padding:4px 8px; }
+
   .activity-row { display:flex; align-items:flex-start; gap:8px; padding:9px 0; border-bottom:1px solid #f2f3f6; }
   .activity-title { font-size:12px; font-weight:600; }
   .activity-sub { font-size:11px; color:#8a8f9c; }
   .activity-time { font-size:10px; color:#b3b7c2; margin-right:auto; white-space:nowrap; }
+
   .row2 { display:grid; grid-template-columns:1.3fr 1fr; gap:16px; }
   table.simple { width:100%; border-collapse:collapse; font-size:12px; }
   table.simple th { text-align:left; color:#8a8f9c; font-weight:500; padding:7px 6px; border-bottom:1px solid #eceef2; }
@@ -80,6 +89,7 @@ PAGE_HTML = r"""
 </head>
 <body>
 <div class="shell">
+
   <div class="sidebar">
     <div class="brand">
       <div class="logo">A</div>
@@ -92,15 +102,18 @@ PAGE_HTML = r"""
     <div class="nav-item">&#128179; Orders</div>
     <div class="nav-item">&#128226; Marketing</div>
     <div class="nav-item">&#9881; Settings</div>
+
     <div class="side-section">Filters</div>
     <div class="side-field"><label>Date Range</label><div class="box">&#128197; Jan 1, 2026 &ndash; Dec 31, 2026</div></div>
     <div class="side-field"><label>Region</label><div class="box">All Regions &#9662;</div></div>
     <div class="side-field"><label>Channel</label><div class="box">All Channels &#9662;</div></div>
+
     <div class="profile">
       <div class="av">JD</div>
       <div><div>Jane Doe</div><div>Administrator</div></div>
     </div>
   </div>
+
   <div class="main">
     <div class="head">
       <div>
@@ -112,6 +125,7 @@ PAGE_HTML = r"""
         <span class="bell">&#128276;<span class="dot">3</span></span>
       </div>
     </div>
+
     <div class="kpi-row">
       <div class="kpi-card">
         <div class="kpi-top"><div class="kpi-icon" style="background:#2a5bd722;color:#2a5bd7;">$</div><span style="color:#c7cbd6;">&#8942;</span></div>
@@ -154,6 +168,7 @@ PAGE_HTML = r"""
         <svg class="spark" width="100%" height="24" viewBox="0 0 140 24" preserveAspectRatio="none"><polyline points="0,10 20,14 40,9 60,16 80,11 100,15 120,7 140,12" fill="none" stroke="#eb6834" stroke-width="2"/></svg>
       </div>
     </div>
+
     <div class="measure-row">
       <span class="lbl">Select Measure</span>
       <span class="pill active">Revenue</span>
@@ -161,6 +176,7 @@ PAGE_HTML = r"""
       <span class="pill">Orders</span>
       <span class="pill">Quantity</span>
     </div>
+
     <div class="row3">
       <div class="panel">
         <div class="panel-head">
@@ -179,6 +195,7 @@ PAGE_HTML = r"""
           <path d="M26,30 C90,30 90,45 140,45 L140,80 C90,80 90,30 26,30 Z" fill="#2a5bd7" opacity="0.12"/>
           <path d="M26,90 C90,90 90,125 140,125 L140,155 C90,155 90,90 26,90 Z" fill="#eb6834" opacity="0.15"/>
           <path d="M26,150 C90,150 90,205 140,205 L140,240 C90,240 90,150 26,150 Z" fill="#12b3a6" opacity="0.15"/>
+          <text x="586" y="0" font-size="1"></text>
           <text x="30" y="135" font-size="11" fill="#1f2430" transform="rotate(-90 30 135)">Total Revenue</text>
           <text x="164" y="40" font-size="10" fill="#1f2430">Corporate</text>
           <text x="164" y="120" font-size="10" fill="#1f2430">Home Office</text>
@@ -189,6 +206,7 @@ PAGE_HTML = r"""
           <text x="230" y="225" font-size="9" fill="#8a8f9c">Accessories</text>
         </svg>
       </div>
+
       <div class="panel">
         <div class="panel-head">
           <div><div class="panel-title">Revenue Trend</div></div>
@@ -216,6 +234,7 @@ PAGE_HTML = r"""
           <text x="510" y="215" font-size="9" fill="#8a8f9c" text-anchor="middle">Nov</text>
         </svg>
       </div>
+
       <div class="panel">
         <div class="panel-title" style="margin-bottom:10px;">Recent Activity</div>
         <div class="activity-row"><span>&#128200;</span><div><div class="activity-title">Revenue increased</div><div class="activity-sub">18.6% vs last month</div></div><div class="activity-time">5m ago</div></div>
@@ -225,6 +244,7 @@ PAGE_HTML = r"""
         <div class="activity-row"><span>&#128230;</span><div><div class="activity-title">Inventory alert</div><div class="activity-sub">4 items low in stock</div></div><div class="activity-time">2d ago</div></div>
       </div>
     </div>
+
     <div class="row2">
       <div class="panel">
         <div class="panel-title" style="margin-bottom:12px;">Revenue by Region and Category</div>
@@ -247,10 +267,12 @@ PAGE_HTML = r"""
         <div class="insight-box">&#128161; Technology sales are up 24% compared to last month. Consider increasing inventory.</div>
       </div>
     </div>
+
   </div>
 </div>
 </body>
 </html>
+
 """
 
 components.html(PAGE_HTML, height=1600, scrolling=False)
