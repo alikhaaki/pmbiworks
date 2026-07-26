@@ -2,248 +2,225 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 
-# =====================================================================
-# تنظیمات ماژولار — هر بخش رو با True (روشن) یا False (خاموش) کنترل کن
-# =====================================================================
 SECTIONS = {
-    "topbar": True,
-    "kpi": True,
-    "budget_bar": True,
-    "delay_pie": True,
-    "s_curve": True,
-    "checklist": True,
-    "risk_matrix": True,
-    "team_table": True,
+    "sidebar": True,
+    "kpi_row": True,
+    "measure_tabs": True,
+    "performance_flow": True,
+    "revenue_trend": True,
+    "recent_activity": True,
+    "region_table": True,
+    "state_revenue": True,
+    "insights": True,
 }
 
-st.set_page_config(page_title="داشبورد مدیریت پروژه", page_icon="📊", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="داشبورد مدیریت پروژه", page_icon="📊", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
     html, body, [class*="css"]  { direction: rtl; text-align: right; font-family: 'Tahoma', sans-serif; }
-    .block-container { padding-top: 1.5rem; padding-bottom: 2rem; }
-    .card {
-        background: #ffffff; border: 1px solid #eceef2; border-radius: 14px;
-        padding: 20px 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .kpi-label { font-size: 13px; color: #8a8f9c; margin-bottom: 8px; }
-    .kpi-value { font-size: 28px; font-weight: 700; color: #1f2430; }
-    .kpi-delta-good { display:inline-block; margin-top:8px; font-size:12px; background:#e6f6ec; color:#1c8a4b; padding:3px 10px; border-radius:6px; }
-    .kpi-delta-warn { display:inline-block; margin-top:8px; font-size:12px; background:#fdf1e3; color:#b56a1a; padding:3px 10px; border-radius:6px; }
-    .kpi-delta-bad { display:inline-block; margin-top:8px; font-size:12px; background:#fdecec; color:#c73434; padding:3px 10px; border-radius:6px; }
-    .panel-title { font-size:16px; font-weight:700; margin-bottom:2px; }
+    .block-container { padding-top: 1.2rem; padding-bottom: 2rem; }
+    section[data-testid="stSidebar"] { background: #12172b; }
+    section[data-testid="stSidebar"] * { color: #e3e6f0 !important; }
+    section[data-testid="stSidebar"] .stButton button { background: transparent; border: none; text-align: right; width: 100%; }
+    .card { background: #ffffff; border: 1px solid #eceef2; border-radius: 14px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .kpi-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; margin-bottom:10px; }
+    .kpi-label { font-size: 12px; color: #8a8f9c; margin-bottom: 4px; }
+    .kpi-value { font-size: 22px; font-weight: 700; color: #1f2430; }
+    .kpi-delta { font-size: 11px; color: #1c8a4b; margin-top: 4px; }
+    .kpi-vs { font-size: 11px; color: #b3b7c2; }
+    .panel-title { font-size:15px; font-weight:700; margin-bottom:2px; }
     .panel-sub { font-size:12px; color:#8a8f9c; margin-bottom: 14px; }
-    .check-card { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; }
-    .check-ok { color:#1c8a4b; }
-    .check-bad { color:#c73434; }
-    .risk-cell { height:40px; border-radius:6px; }
+    .activity-row { display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid #f2f3f6; }
+    .activity-title { font-size:13px; font-weight:600; }
+    .activity-sub { font-size:12px; color:#8a8f9c; }
+    .activity-time { font-size:11px; color:#b3b7c2; margin-right:auto; }
+    .insight-box { background:#eef4ff; border-radius:10px; padding:14px 16px; font-size:13px; color:#1f2430; line-height:1.8; }
+    table.simple { width:100%; border-collapse:collapse; font-size:13px; }
+    table.simple th { text-align:right; color:#8a8f9c; font-weight:normal; padding:8px 6px; border-bottom:1px solid #eceef2; }
+    table.simple td { padding:9px 6px; border-bottom:1px solid #f2f3f6; }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-COLOR_PLAN = "#2a5bd7"
-COLOR_ACTUAL = "#eb6834"
+COLOR_BLUE = "#2a5bd7"
+COLOR_PURPLE = "#7b5cf0"
+COLOR_TEAL = "#12b3a6"
+COLOR_ORANGE = "#eb6834"
 
-# ---------- sample / placeholder data ----------
-months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور"]
-planned_cum = [15, 32, 50, 68, 85, 100]
-actual_cum = [12, 28, 47, 72, 90, 103]
+if SECTIONS["sidebar"]:
+    with st.sidebar:
+        st.markdown("### 🅐 مرکز عملکرد تحلیلی")
+        st.caption("PMBI Works")
+        st.write("")
+        st.button("📊  نمای کلی", use_container_width=True)
+        st.button("📄  گزارش‌ها", use_container_width=True)
+        st.button("👥  مشتریان", use_container_width=True)
+        st.button("📦  محصولات", use_container_width=True)
+        st.button("🧾  سفارش‌ها", use_container_width=True)
+        st.button("📣  بازاریابی", use_container_width=True)
+        st.button("⚙️  تنظیمات", use_container_width=True)
+        st.write("---")
+        st.markdown("**فیلترها**")
+        st.date_input("بازه‌ی تاریخ")
+        st.selectbox("منطقه", ["همه‌ی مناطق", "شمال", "جنوب", "مرکز"])
+        st.selectbox("کانال", ["همه‌ی کانال‌ها", "حضوری", "آنلاین"])
+        st.write("---")
+        st.markdown("👤 **علی خاکی**  \nمدیر سیستم")
 
-floors = ["طبقه ۱", "طبقه ۲", "طبقه ۳", "طبقه ۴"]
-floor_planned = [75, 90, 60, 30]
-floor_actual = [65, 95, 55, 34]
+h1, h2 = st.columns([3, 1])
+with h1:
+    st.markdown("## نمای کلی")
+    st.caption("بینش عملکرد و شاخص‌های کلیدی به‌صورت لحظه‌ای")
+with h2:
+    st.markdown(
+        '<div style="text-align:left;font-size:12px;color:#8a8f9c;">آخرین به‌روزرسانی: ۵ دقیقه پیش &nbsp; 🔔</div>',
+        unsafe_allow_html=True,
+    )
+st.write("")
 
-delay_labels = ["طبقه ۲", "طبقه ۱", "طبقه ۳", "طبقه ۴"]
-delay_values = [33, 28, 22, 17]
-
-checklist_items = [
-    ("تکمیل کارهای اولیه", True),
-    ("تامین تجهیزات", False),
-    ("تامین نیروی انسانی", True),
-    ("تست کیفی", True),
-    ("تایید نقشه‌ها", False),
-    ("تست نهایی", True),
-]
-
-risk_rows = ["زیاد", "متوسط", "کم"]
-risk_cols = ["کم", "متوسط", "زیاد"]
-risk_grid = [
-    ["#f2b53a", "#e35d4f", "#e35d4f"],
-    ["#7bc96f", "#f2b53a", "#e35d4f"],
-    ["#7bc96f", "#7bc96f", "#f2b53a"],
-]
-
-tasks = pd.DataFrame({
-    "فعالیت": ["نصب سقف کاذب", "لوله‌کشی تاسیسات", "نازک‌کاری دیوارها", "اجرای کف‌سازی"],
-    "طبقه": ["طبقه ۲", "طبقه ۱", "طبقه ۳", "طبقه ۴"],
-    "مسئول": ["واحد اجرا", "پیمانکار مکانیک", "واحد اجرا", "پیمانکار برق"],
-    "پیشرفت": [45, 70, 90, 20],
-    "وضعیت": ["تاخیر دارد", "در حال بررسی", "طبق برنامه", "تاخیر دارد"],
-})
-
-
-def panel_header(title, sub):
-    st.markdown(f'<div class="panel-title">{title}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="panel-sub">{sub}</div>', unsafe_allow_html=True)
-
-
-# ---------- top bar ----------
-if SECTIONS["topbar"]:
-    t1, t2, t3 = st.columns([3, 2, 1.2])
-    with t1:
-        st.markdown("### داشبورد مدیریت پروژه A")
-    with t2:
-        st.selectbox("پروژه", ["پروژه A", "پروژه B", "پروژه C"], label_visibility="collapsed")
-    with t3:
-        st.button("دانلود گزارش PDF", use_container_width=True)
-    st.write("")
-
-# ---------- KPI row ----------
-if SECTIONS["kpi"]:
-    k1, k2, k3, k4 = st.columns(4)
-    kpis = [
-        (k1, "پیشرفت کلی پروژه", "۶۸٪", "▲ ۳٪ جلوتر از برنامه", "good"),
-        (k2, "تاخیرات باز", "۱۸", "۵ مورد بحرانی", "warn"),
-        (k3, "وضعیت بودجه", "۹۲٪", "در محدوده مصوب", "good"),
-        (k4, "روزهای باقی‌مانده", "۴۲", "۶ روز کمتر از برنامه", "bad"),
+if SECTIONS["kpi_row"]:
+    kpi_data = [
+        ("💰", COLOR_BLUE, "درآمد کل", "۸۴۲,۴۵۰,۰۰۰ تومان", "▲ ۱۸.۶٪", "سال قبل: ۷۱۱,۰۲۴,۰۰۰"),
+        ("📈", COLOR_PURPLE, "سود ناخالص", "۱۵۲,۸۶۰,۰۰۰ تومان", "▲ ۱۴.۲٪", "سال قبل: ۱۳۳,۶۶۸,۰۰۰"),
+        ("🛒", COLOR_TEAL, "سفارش‌ها", "۱۲,۸۴۶", "▲ ۹.۷٪", "سال قبل: ۱۱,۷۰۴"),
+        ("👥", COLOR_TEAL, "مشتریان", "۶,۲۹۴", "▲ ۱۱.۳٪", "سال قبل: ۵,۶۵۵"),
+        ("🏷️", COLOR_ORANGE, "میانگین ارزش سفارش", "۶۵۵,۴۰۰ تومان", "▲ ۷.۳٪", "سال قبل: ۶۱۰,۷۰۰"),
     ]
-    for col, label, value, delta, kind in kpis:
+    cols = st.columns(5)
+    for col, (icon, color, label, value, delta, vs) in zip(cols, kpi_data):
         with col:
             st.markdown(f"""
             <div class="card">
+                <div class="kpi-icon" style="background:{color}22;color:{color};">{icon}</div>
                 <div class="kpi-label">{label}</div>
                 <div class="kpi-value">{value}</div>
-                <div class="kpi-delta-{kind}">{delta}</div>
+                <div class="kpi-delta">{delta}</div>
+                <div class="kpi-vs">{vs}</div>
             </div>
             """, unsafe_allow_html=True)
     st.write("")
 
-# ---------- budget bar + delay pie (side by side) ----------
-if SECTIONS["budget_bar"] or SECTIONS["delay_pie"]:
-    bc1, bc2 = st.columns(2)
-    if SECTIONS["budget_bar"]:
-        with bc1:
-            with st.container(border=True):
-                panel_header("پیشرفت برنامه‌ای و واقعی", "درصد پیشرفت به تفکیک طبقه")
-                fig_bar = go.Figure()
-                fig_bar.add_trace(go.Bar(x=floors, y=floor_planned, name="برنامه‌ای", marker_color=COLOR_PLAN))
-                fig_bar.add_trace(go.Bar(x=floors, y=floor_actual, name="واقعی", marker_color=COLOR_ACTUAL))
-                fig_bar.update_layout(
-                    barmode="group", height=300, margin=dict(l=10, r=10, t=10, b=10),
-                    plot_bgcolor="white", paper_bgcolor="white",
-                    yaxis=dict(ticksuffix="٪", gridcolor="#f0f1f4"),
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                    font=dict(family="Tahoma"),
-                )
-                st.plotly_chart(fig_bar, use_container_width=True, config={"displayModeBar": False})
-    if SECTIONS["delay_pie"]:
-        with bc2:
-            with st.container(border=True):
-                panel_header("تاخیرها بر اساس طبقه", "نسبت موارد باز")
-                fig_donut = go.Figure(data=[go.Pie(
-                    labels=delay_labels, values=delay_values, hole=0.55,
-                    marker=dict(colors=[COLOR_PLAN, COLOR_ACTUAL, "#1c9e6e", "#d9a92a"]),
-                    textinfo="label+percent",
-                )])
-                fig_donut.update_layout(
-                    height=300, margin=dict(l=10, r=10, t=10, b=10),
-                    paper_bgcolor="white", showlegend=False,
-                    font=dict(family="Tahoma"),
-                )
-                st.plotly_chart(fig_donut, use_container_width=True, config={"displayModeBar": False})
+if SECTIONS["measure_tabs"]:
+    st.radio("انتخاب شاخص", ["درآمد", "سود", "سفارش‌ها", "تعداد"], horizontal=True, label_visibility="collapsed")
     st.write("")
 
-# ---------- checklist + s-curve ----------
-if SECTIONS["checklist"] or SECTIONS["s_curve"]:
-    lc, rc = st.columns([1, 1.6])
-    if SECTIONS["checklist"]:
-        with lc:
-            with st.container(border=True):
-                panel_header("وضعیت مراحل کلیدی", "خلاصه‌ی مراحل اصلی پروژه")
-                for i in range(0, len(checklist_items), 2):
-                    cc1, cc2 = st.columns(2)
-                    pair = checklist_items[i:i + 2]
-                    for col, (label, ok) in zip([cc1, cc2], pair):
-                        icon = "✅" if ok else "🔴"
-                        cls = "check-ok" if ok else "check-bad"
-                        with col:
-                            st.markdown(f"""
-                            <div class="card check-card">
-                                <span>{label}</span>
-                                <span class="{cls}">{icon}</span>
-                            </div>
-                            """, unsafe_allow_html=True)
-    if SECTIONS["s_curve"]:
-        with rc:
-            with st.container(border=True):
-                panel_header("منحنی S پیشرفت تجمعی", "برنامه‌ای در برابر واقعی")
-                fig_s = go.Figure()
-                fig_s.add_trace(go.Scatter(x=months, y=planned_cum, mode="lines+markers", name="برنامه‌ای",
-                                            fill="tozeroy", fillcolor="rgba(42,91,215,0.08)",
-                                            line=dict(color=COLOR_PLAN, width=3), marker=dict(size=6)))
-                fig_s.add_trace(go.Scatter(x=months, y=actual_cum, mode="lines+markers", name="واقعی",
-                                            line=dict(color=COLOR_ACTUAL, width=3), marker=dict(size=6)))
-                fig_s.update_layout(
-                    height=300, margin=dict(l=10, r=10, t=10, b=10),
-                    plot_bgcolor="white", paper_bgcolor="white",
-                    xaxis=dict(showgrid=False),
-                    yaxis=dict(ticksuffix="٪", gridcolor="#f0f1f4"),
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                    font=dict(family="Tahoma"),
-                )
-                st.plotly_chart(fig_s, use_container_width=True, config={"displayModeBar": False})
-    st.write("")
+if SECTIONS["performance_flow"] or SECTIONS["revenue_trend"] or SECTIONS["recent_activity"]:
+    fc, tc, ac = st.columns([1.1, 1.4, 0.9])
 
-# ---------- risk matrix + team table ----------
-if SECTIONS["risk_matrix"] or SECTIONS["team_table"]:
-    mc, tc = st.columns([1, 1.6])
-    if SECTIONS["risk_matrix"]:
-        with mc:
+    if SECTIONS["performance_flow"]:
+        with fc:
             with st.container(border=True):
-                panel_header("ماتریس ریسک پروژه", "احتمال در برابر شدت اثر")
-                grid_html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">'
-                for r in range(3):
-                    for c in range(3):
-                        grid_html += f'<div class="risk-cell" style="background:{risk_grid[r][c]};"></div>'
-                grid_html += '</div>'
-                st.markdown(grid_html, unsafe_allow_html=True)
-                st.markdown(
-                    '<div style="display:flex;justify-content:space-between;font-size:12px;color:#8a8f9c;margin-top:8px;">'
-                    '<span>کم</span><span>متوسط</span><span>زیاد</span></div>',
-                    unsafe_allow_html=True,
-                )
-    if SECTIONS["team_table"]:
+                st.markdown('<div class="panel-title">نمودار جریان عملکرد</div>', unsafe_allow_html=True)
+                st.markdown('<div class="panel-sub">تفکیک درآمد کل بر اساس دسته‌بندی</div>', unsafe_allow_html=True)
+                labels = ["درآمد کل", "مصرف‌کننده", "شرکتی", "خانگی", "لوازم اداری", "مبلمان", "فناوری"]
+                sankey_fig = go.Figure(go.Sankey(
+                    node=dict(
+                        pad=15, thickness=16,
+                        label=labels,
+                        color=[COLOR_BLUE, COLOR_TEAL, COLOR_PURPLE, COLOR_ORANGE, "#9aa4c9", "#9aa4c9", "#9aa4c9"],
+                    ),
+                    link=dict(
+                        source=[0, 0, 0, 1, 2, 3],
+                        target=[1, 2, 3, 4, 5, 6],
+                        value=[421, 256, 163, 240, 318, 283],
+                        color="rgba(42,91,215,0.15)",
+                    ),
+                ))
+                sankey_fig.update_layout(height=320, margin=dict(l=0, r=0, t=0, b=0), font=dict(family="Tahoma", size=11))
+                st.plotly_chart(sankey_fig, use_container_width=True, config={"displayModeBar": False})
+
+    if SECTIONS["revenue_trend"]:
         with tc:
             with st.container(border=True):
-                panel_header("آخرین فعالیت‌های بحرانی", "مواردی که نیاز به پیگیری فوری دارند")
+                st.markdown('<div class="panel-title">روند درآمد</div>', unsafe_allow_html=True)
+                st.markdown('<div class="panel-sub">درآمد ماهانه بر حسب تومان</div>', unsafe_allow_html=True)
+                months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر"]
+                revenue = [55, 40, 62, 58, 70, 65, 78, 105, 90]
+                fig_trend = go.Figure()
+                fig_trend.add_trace(go.Scatter(
+                    x=months, y=revenue, mode="lines+markers", fill="tozeroy",
+                    line=dict(color=COLOR_BLUE, width=3), fillcolor="rgba(42,91,215,0.08)",
+                ))
+                fig_trend.update_layout(
+                    height=320, margin=dict(l=10, r=10, t=10, b=10),
+                    plot_bgcolor="white", paper_bgcolor="white",
+                    yaxis=dict(ticksuffix=" م", gridcolor="#f0f1f4"),
+                    xaxis=dict(showgrid=False),
+                    font=dict(family="Tahoma"),
+                )
+                st.plotly_chart(fig_trend, use_container_width=True, config={"displayModeBar": False})
 
-                def status_badge(status):
-                    colors = {"تاخیر دارد": "#c73434", "در حال بررسی": "#b56a1a", "طبق برنامه": "#1c8a4b"}
-                    bg = {"تاخیر دارد": "#fdecec", "در حال بررسی": "#fdf1e3", "طبق برنامه": "#e6f6ec"}
-                    return f'<span style="background:{bg[status]};color:{colors[status]};padding:4px 10px;border-radius:6px;font-size:12px;">{status}</span>'
+    if SECTIONS["recent_activity"]:
+        with ac:
+            with st.container(border=True):
+                st.markdown('<div class="panel-title">فعالیت‌های اخیر</div>', unsafe_allow_html=True)
+                st.write("")
+                activities = [
+                    ("📈", "افزایش درآمد", "۱۸.۶٪ نسبت به ماه قبل", "۵ دقیقه پیش"),
+                    ("🏷️", "پرفروش‌ترین دسته", "فناوری اطلاعات", "۱ ساعت پیش"),
+                    ("👤", "مشتری جدید", "شرکت آرمان به لیست اضافه شد", "۳ ساعت پیش"),
+                    ("🎯", "تحقق هدف", "هدف فصلی درآمد محقق شد", "۱ روز پیش"),
+                    ("📦", "هشدار موجودی", "۴ قلم کالا رو به اتمام", "۲ روز پیش"),
+                ]
+                for icon, title, sub, time in activities:
+                    st.markdown(f"""
+                    <div class="activity-row">
+                        <span>{icon}</span>
+                        <div>
+                            <div class="activity-title">{title}</div>
+                            <div class="activity-sub">{sub}</div>
+                        </div>
+                        <div class="activity-time">{time}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+    st.write("")
 
-                rows_html = ""
-                for _, row in tasks.iterrows():
-                    rows_html += f"""
-                    <tr>
-                        <td style="padding:10px 6px;border-bottom:1px solid #f2f3f6;">{row['فعالیت']}</td>
-                        <td style="padding:10px 6px;border-bottom:1px solid #f2f3f6;">{row['طبقه']}</td>
-                        <td style="padding:10px 6px;border-bottom:1px solid #f2f3f6;">{row['مسئول']}</td>
-                        <td style="padding:10px 6px;border-bottom:1px solid #f2f3f6;">{row['پیشرفت']}٪</td>
-                        <td style="padding:10px 6px;border-bottom:1px solid #f2f3f6;">{status_badge(row['وضعیت'])}</td>
-                    </tr>
-                    """
-                table_html = f"""
-                <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                    <tr>
-                        <th style="text-align:right;color:#8a8f9c;font-weight:normal;padding:8px 6px;border-bottom:1px solid #eceef2;">فعالیت</th>
-                        <th style="text-align:right;color:#8a8f9c;font-weight:normal;padding:8px 6px;border-bottom:1px solid #eceef2;">طبقه</th>
-                        <th style="text-align:right;color:#8a8f9c;font-weight:normal;padding:8px 6px;border-bottom:1px solid #eceef2;">مسئول</th>
-                        <th style="text-align:right;color:#8a8f9c;font-weight:normal;padding:8px 6px;border-bottom:1px solid #eceef2;">پیشرفت</th>
-                        <th style="text-align:right;color:#8a8f9c;font-weight:normal;padding:8px 6px;border-bottom:1px solid #eceef2;">وضعیت</th>
-                    </tr>
-                    {rows_html}
-                </table>
-                """
-                st.markdown(table_html, unsafe_allow_html=True)
+if SECTIONS["region_table"] or SECTIONS["state_revenue"] or SECTIONS["insights"]:
+    rt, sv, ins = st.columns([1.3, 1, 0.9])
+
+    if SECTIONS["region_table"]:
+        with rt:
+            with st.container(border=True):
+                st.markdown('<div class="panel-title">درآمد بر اساس منطقه و دسته</div>', unsafe_allow_html=True)
+                st.write("")
+                region_df = pd.DataFrame({
+                    "منطقه": ["غرب", "جنوب", "شرق", "مرکز"],
+                    "لوازم اداری": ["۹۷,۱۲۵", "۶۳,۸۸۴", "۶۸,۷۷۵", "۴۱,۰۵۶"],
+                    "مبلمان": ["۱۰۵,۴۴۱", "۷۱,۲۲۰", "۸۲,۴۵۱", "۵۴,۸۷۳"],
+                    "فناوری": ["۱۱۵,۸۹۲", "۹۳,۳۷۴", "۱۱۱,۷۹۸", "۶۳,۵۹۵"],
+                    "جمع": ["۳۱۸,۴۵۸", "۲۲۸,۴۷۸", "۲۶۳,۰۲۴", "۱۵۹,۵۲۴"],
+                })
+                st.markdown(region_df.to_html(index=False, classes="simple", border=0), unsafe_allow_html=True)
+
+    if SECTIONS["state_revenue"]:
+        with sv:
+            with st.container(border=True):
+                st.markdown('<div class="panel-title">درآمد بر اساس استان</div>', unsafe_allow_html=True)
+                st.write("")
+                states = ["تهران", "اصفهان", "فارس", "خراسان", "آذربایجان"]
+                values = [128.9, 82.4, 55.7, 41.3, 34.8]
+                fig_state = go.Figure(go.Bar(
+                    x=values, y=states, orientation="h", marker_color=COLOR_BLUE,
+                    text=[f"{v} م" for v in values], textposition="outside",
+                ))
+                fig_state.update_layout(
+                    height=280, margin=dict(l=10, r=10, t=10, b=10),
+                    plot_bgcolor="white", paper_bgcolor="white",
+                    xaxis=dict(showgrid=False, visible=False),
+                    yaxis=dict(autorange="reversed"),
+                    font=dict(family="Tahoma"),
+                )
+                st.plotly_chart(fig_state, use_container_width=True, config={"displayModeBar": False})
+
+    if SECTIONS["insights"]:
+        with ins:
+            with st.container(border=True):
+                st.markdown('<div class="panel-title">بینش‌ها</div>', unsafe_allow_html=True)
+                st.write("")
+                st.markdown(
+                    '<div class="insight-box">💡 فروش دسته‌ی فناوری نسبت به ماه قبل ۲۴٪ رشد داشته. '
+                    'پیشنهاد می‌شه سطح موجودی این دسته افزایش پیدا کنه.</div>',
+                    unsafe_allow_html=True,
+                )
